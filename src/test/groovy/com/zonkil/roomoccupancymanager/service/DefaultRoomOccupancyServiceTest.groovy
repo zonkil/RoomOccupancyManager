@@ -2,7 +2,6 @@ package com.zonkil.roomoccupancymanager.service
 
 import spock.lang.Specification
 import spock.lang.Subject
-import spock.lang.Unroll
 
 class DefaultRoomOccupancyServiceTest extends Specification {
 

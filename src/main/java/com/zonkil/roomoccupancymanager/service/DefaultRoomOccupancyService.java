@@ -1,60 +1,49 @@
 package com.zonkil.roomoccupancymanager.service;
 
+import com.zonkil.roomoccupancymanager.domain.Guests;
 import com.zonkil.roomoccupancymanager.domain.RoomOccupancyCalculation;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.util.Comparator;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
-
-import static java.util.function.Predicate.not;
 
 @Service
 public class DefaultRoomOccupancyService implements RoomOccupancyService {
 
-	private static final BigDecimal THRESHOLD = BigDecimal.valueOf(100);
-
 	@Override
 	public RoomOccupancyCalculation calculateRoomOccupancy(int numberOfPremiumRooms, int numberOfEconomyRooms,
-			List<BigDecimal> guests) {
+			List<BigDecimal> allGuests) {
 
-		var premiumGuests = guests.stream()
-								  .filter(this::isPremiumGuest)
-								  .sorted(Comparator.reverseOrder())
-								  .limit(numberOfPremiumRooms)
-								  .collect(Collectors.toList());
-		var economyGuests = guests.stream()
-								  .filter(not(this::isPremiumGuest))
-								  .sorted(Comparator.reverseOrder())
-								  .collect(Collectors.toList());
+		Guests guests = Guests.ofAllGuests(allGuests);
 
 		//is upgrade
-		if (numberOfPremiumRooms > premiumGuests.size() && economyGuests.size() > numberOfEconomyRooms) {
-			var guestToPromote = economyGuests.stream()
-											  .limit(numberOfPremiumRooms - premiumGuests.size())
-											  .collect(Collectors.toList());
-			premiumGuests.addAll(guestToPromote);
-			economyGuests.removeAll(guestToPromote);
+		if (numberOfPremiumRooms > guests.getPremiumGuestsNumber()
+				&& guests.getEconomyGuestsNumber() > numberOfEconomyRooms) {
+			var emptyPremiumRoomsCount = numberOfPremiumRooms - guests.getPremiumGuestsNumber();
+			guests = guests.promote(emptyPremiumRoomsCount);
 		}
 
+		var premiumOccupancy = occupancy(numberOfPremiumRooms, guests.getPremiumGuestsNumber());
+		var economyOccupancy = occupancy(numberOfEconomyRooms, guests.getEconomyGuestsNumber());
+		var premiumMoney = calculateMoneyLimitedByRooms(guests.getPremiumGuests(), numberOfPremiumRooms);
+		var economyMoney = calculateMoneyLimitedByRooms(guests.getEconomyGuests(), numberOfEconomyRooms);
+
 		return RoomOccupancyCalculation.builder()
-									   .premiumOccupancy(numberOfPremiumRooms > premiumGuests.size() ?
-											   premiumGuests.size() :
-											   numberOfPremiumRooms)
-									   .premiumTotalMoney(
-											   premiumGuests.stream().reduce(BigDecimal.ZERO, BigDecimal::add))
-									   .economyOccupancy(numberOfEconomyRooms > economyGuests.size() ?
-											   economyGuests.size() :
-											   numberOfEconomyRooms)
-									   .economyTotalMoney(economyGuests.stream()
-																	   .limit(numberOfEconomyRooms)
-																	   .reduce(BigDecimal.ZERO, BigDecimal::add))
+									   .premiumOccupancy(premiumOccupancy)
+									   .premiumTotalMoney(premiumMoney)
+									   .economyOccupancy(economyOccupancy)
+									   .economyTotalMoney(economyMoney)
 									   .build();
 	}
 
-	private boolean isPremiumGuest(BigDecimal guest) {
-		return guest.compareTo(THRESHOLD) >= 0;
+	private int occupancy(int numberOfPremiumRooms, int numberOfGuests) {
+		return Math.min(numberOfPremiumRooms, numberOfGuests);
+	}
+
+	private BigDecimal calculateMoneyLimitedByRooms(List<BigDecimal> guestsList, int numberOfRooms) {
+		return guestsList.stream().limit(numberOfRooms).reduce(BigDecimal.ZERO, BigDecimal::add);
 	}
 
 }
