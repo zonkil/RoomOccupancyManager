@@ -3,13 +3,14 @@ package com.zonkil.roomoccupancymanager.service
 import spock.lang.Specification
 import spock.lang.Subject
 
-class DefaultRoomOccupancyServiceTest extends Specification {
+class DefaultRoomOccupancyServiceIntegrationTest extends Specification {
 
     @Subject
     DefaultRoomOccupancyService defaultRoomOccupancyService
 
     void setup() {
-        defaultRoomOccupancyService = new DefaultRoomOccupancyService()
+        def emptyPremiumRoomUpgradeService = new EmptyPremiumRoomUpgradeService()
+        defaultRoomOccupancyService = new DefaultRoomOccupancyService(emptyPremiumRoomUpgradeService)
     }
 
     def "shouldCalculateRoomOccupancy"() {

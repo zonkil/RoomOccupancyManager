@@ -1,15 +1,16 @@
 package com.zonkil.roomoccupancymanager.domain;
 
 import lombok.Getter;
+import lombok.ToString;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Getter
+@ToString
 public class Guests {
 	private static final BigDecimal THRESHOLD = BigDecimal.valueOf(100);
 
@@ -48,14 +49,5 @@ public class Guests {
 
 	public int getEconomyGuestsNumber() {
 		return getEconomyGuests().size();
-	}
-
-	public Guests promote(int numberGuestToPromote) {
-		var guestToPromote = getEconomyGuests().stream().limit(numberGuestToPromote).collect(Collectors.toList());
-		var newPrem = new ArrayList<>(getPremiumGuests());
-		var newEcon = new ArrayList<>(getEconomyGuests());
-		newPrem.addAll(guestToPromote);
-		newEcon.removeAll(guestToPromote);
-		return new Guests(newPrem, newEcon);
 	}
 }
