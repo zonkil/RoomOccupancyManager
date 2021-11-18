@@ -13,12 +13,12 @@ import java.util.stream.Collectors;
 public class Guests {
 	private static final BigDecimal THRESHOLD = BigDecimal.valueOf(100);
 
-	private final List<BigDecimal> premiumGuests;
-	private final List<BigDecimal> economyGuests;
+	private final List<Guest> premiumGuests;
+	private final List<Guest> economyGuests;
 
-	public static Guests ofAllGuests(List<BigDecimal> allGuests) {
-		List<BigDecimal> prem = new ArrayList<>(allGuests.size() / 2 + 1);
-		List<BigDecimal> econ = new ArrayList<>(allGuests.size() / 2);
+	public static Guests ofAllGuests(List<Guest> allGuests) {
+		List<Guest> prem = new ArrayList<>(allGuests.size() / 2 + 1);
+		List<Guest> econ = new ArrayList<>(allGuests.size() / 2);
 		allGuests.forEach(guest -> {
 			if (isPremiumGuest(guest)) {
 				prem.add(guest);
@@ -31,11 +31,11 @@ public class Guests {
 		return new Guests(prem, econ);
 	}
 
-	public static boolean isPremiumGuest(BigDecimal guest) {
-		return guest.compareTo(THRESHOLD) >= 0;
+	public static boolean isPremiumGuest(Guest guest) {
+		return guest.getMoneyAmount().compareTo(THRESHOLD) >= 0;
 	}
 
-	public Guests(List<BigDecimal> premiumGuests, List<BigDecimal> economyGuests) {
+	public Guests(List<Guest> premiumGuests, List<Guest> economyGuests) {
 		premiumGuests.sort(Comparator.reverseOrder());
 		economyGuests.sort(Comparator.reverseOrder());
 		this.premiumGuests = Collections.unmodifiableList(premiumGuests);

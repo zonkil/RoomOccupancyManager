@@ -1,11 +1,11 @@
 package com.zonkil.roomoccupancymanager.service;
 
+import com.zonkil.roomoccupancymanager.domain.Guest;
 import com.zonkil.roomoccupancymanager.domain.Guests;
 import com.zonkil.roomoccupancymanager.domain.RoomOccupancyCalculation;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -16,7 +16,7 @@ public class DefaultRoomOccupancyService implements RoomOccupancyService {
 	public RoomOccupancyCalculation calculateRoomOccupancy(int numberOfPremiumRooms, int numberOfEconomyRooms,
 			List<BigDecimal> allGuests) {
 
-		Guests guests = Guests.ofAllGuests(allGuests);
+		Guests guests = Guests.ofAllGuests(allGuests.stream().map(Guest::new).collect(Collectors.toList()));
 
 		//is upgrade
 		if (numberOfPremiumRooms > guests.getPremiumGuestsNumber()
@@ -42,8 +42,10 @@ public class DefaultRoomOccupancyService implements RoomOccupancyService {
 		return Math.min(numberOfPremiumRooms, numberOfGuests);
 	}
 
-	private BigDecimal calculateMoneyLimitedByRooms(List<BigDecimal> guestsList, int numberOfRooms) {
-		return guestsList.stream().limit(numberOfRooms).reduce(BigDecimal.ZERO, BigDecimal::add);
+	private BigDecimal calculateMoneyLimitedByRooms(List<Guest> guestsList, int numberOfRooms) {
+		return guestsList.stream()
+						 .limit(numberOfRooms)
+						 .map(Guest::getMoneyAmount)
+						 .reduce(BigDecimal.ZERO, BigDecimal::add);
 	}
-
 }
