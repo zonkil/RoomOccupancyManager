@@ -12,10 +12,13 @@ class EmptyPremiumRoomUpgradeServiceTest extends Specification {
     EmptyPremiumRoomUpgradeService emptyPremiumRoomUpgradeService
 
     void setup() {
-        emptyPremiumRoomUpgradeService = new EmptyPremiumRoomUpgradeService()
+        def threshold = 100.0
+        emptyPremiumRoomUpgradeService = new EmptyPremiumRoomUpgradeService(threshold)
     }
 
     def "testIfUpgradeHappened"() {
+        given:
+        def guests = new Guests(premiumGuests.collect { new Guest(it) }, economyGuests.collect { new Guest(it) })
         when:
         def guestAfterPromotion = emptyPremiumRoomUpgradeService.upgradeGuestsIfNeeded(rooms, guests)
 
@@ -27,9 +30,24 @@ class EmptyPremiumRoomUpgradeServiceTest extends Specification {
         }
 
         where:
-        rooms                   | guests                                                                     | expectedPremiumGuestsCount | expectedEconomyGuestsCount
-        AvailableRooms.of(0, 2) | Guests.ofAllGuests([150.0, 1.0, 2.0, 3.0].collect { it -> new Guest(it) }) | 1                          | 3
-        AvailableRooms.of(2, 4) | Guests.ofAllGuests([150.0, 1.0, 2.0, 3.0].collect { it -> new Guest(it) }) | 1                          | 3
-        AvailableRooms.of(2, 2) | Guests.ofAllGuests([150.0, 1.0, 2.0, 3.0].collect { it -> new Guest(it) }) | 2                          | 2
+        rooms                   | premiumGuests | economyGuests   | expectedPremiumGuestsCount | expectedEconomyGuestsCount
+        AvailableRooms.of(0, 2) | [150.0]       | [1.0, 2.0, 3.0] | 1                          | 3
+        AvailableRooms.of(2, 4) | [150.0]       | [1.0, 2.0, 3.0] | 1                          | 3
+        AvailableRooms.of(2, 2) | [150.0]       | [1.0, 2.0, 3.0] | 2                          | 2
+    }
+
+    def "testIfGuestIsPremium"() {
+        when:
+        def isPremium = emptyPremiumRoomUpgradeService.isPremiumGuest(new Guest(guestMoney))
+
+        then:
+        isPremium == expectedPremiumGuest
+
+        where:
+        guestMoney | expectedPremiumGuest
+        0.0        | false
+        99.99      | false
+        100        | true
+        100.01     | true
     }
 }

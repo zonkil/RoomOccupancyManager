@@ -1,5 +1,6 @@
 package com.zonkil.roomoccupancymanager.service
 
+import com.zonkil.roomoccupancymanager.domain.DefaultGuestsFactory
 import spock.lang.Specification
 import spock.lang.Subject
 
@@ -9,8 +10,10 @@ class DefaultRoomOccupancyServiceIntegrationTest extends Specification {
     DefaultRoomOccupancyService defaultRoomOccupancyService
 
     void setup() {
-        def emptyPremiumRoomUpgradeService = new EmptyPremiumRoomUpgradeService()
-        defaultRoomOccupancyService = new DefaultRoomOccupancyService(emptyPremiumRoomUpgradeService)
+        def threshold = 100.0
+        def emptyPremiumRoomUpgradeService = new EmptyPremiumRoomUpgradeService(threshold)
+        def guestFactory = new DefaultGuestsFactory(emptyPremiumRoomUpgradeService)
+        defaultRoomOccupancyService = new DefaultRoomOccupancyService(emptyPremiumRoomUpgradeService, guestFactory)
     }
 
     def "shouldCalculateRoomOccupancy"() {
