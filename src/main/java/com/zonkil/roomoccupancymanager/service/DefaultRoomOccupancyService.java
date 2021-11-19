@@ -3,27 +3,29 @@ package com.zonkil.roomoccupancymanager.service;
 import com.zonkil.roomoccupancymanager.domain.AvailableRooms;
 import com.zonkil.roomoccupancymanager.domain.Guest;
 import com.zonkil.roomoccupancymanager.domain.Guests;
+import com.zonkil.roomoccupancymanager.domain.DefaultGuestsFactory;
 import com.zonkil.roomoccupancymanager.domain.RoomOccupancyCalculation;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class DefaultRoomOccupancyService implements RoomOccupancyService {
 
 	private final GuestUpgradeService guestUpgradeService;
+	private final DefaultGuestsFactory guestsFactory;
 
-	public DefaultRoomOccupancyService(GuestUpgradeService guestUpgradeService) {
+	public DefaultRoomOccupancyService(GuestUpgradeService guestUpgradeService, DefaultGuestsFactory guestsFactory) {
 		this.guestUpgradeService = guestUpgradeService;
+		this.guestsFactory = guestsFactory;
 	}
 
 	@Override
 	public RoomOccupancyCalculation calculateRoomOccupancy(int numberOfPremiumRooms, int numberOfEconomyRooms,
 			List<BigDecimal> allGuests) {
 
-		Guests guests = Guests.ofAllGuests(allGuests.stream().map(Guest::new).collect(Collectors.toList()));
+		Guests guests = guestsFactory.createGuests(allGuests);
 		AvailableRooms availableRooms = AvailableRooms.of(numberOfPremiumRooms, numberOfEconomyRooms);
 
 		guests = guestUpgradeService.upgradeGuestsIfNeeded(availableRooms, guests);
