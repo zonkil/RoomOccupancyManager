@@ -53,17 +53,17 @@ class RoomOccupancyControllerTest extends Specification {
 
         where:
         url                                                           | expectedStatus
-        "/"                                                           | 400
-        "/?"                                                          | 400
-        "/?numberOfPremiumRooms=1"                                    | 400
-        "/?numberOfPremiumRooms=1&numberOfEconomyRooms=1"             | 400
-        "/?numberOfPremiumRooms=1&allGuests=1"                        | 400
-        "/?numberOfEconomyRooms=1"                                    | 400
-        "/?numberOfEconomyRooms=1&numberOfPremiumRooms=1"             | 400
-        "/?numberOfEconomyRooms=1&allGuests=1"                        | 400
-        "/?allGuests=1"                                               | 400
-        "/?allGuests=1&numberOfPremiumRooms=1"                        | 400
-        "/?allGuests=1&numberOfEconomyRooms=1"                        | 400
-        "/?allGuests=1&numberOfEconomyRooms=1&numberOfPremiumRooms=1" | 200
+        "/occupancy"                                                           | 400
+        "/occupancy?"                                                          | 400
+        "/occupancy?numberOfPremiumRooms=1"                                    | 400
+        "/occupancy?numberOfPremiumRooms=1&numberOfEconomyRooms=1"             | 400
+        "/occupancy?numberOfPremiumRooms=1&allGuests=1"                        | 400
+        "/occupancy?numberOfEconomyRooms=1"                                    | 400
+        "/occupancy?numberOfEconomyRooms=1&numberOfPremiumRooms=1"             | 400
+        "/occupancy?numberOfEconomyRooms=1&allGuests=1"                        | 400
+        "/occupancy?allGuests=1"                                               | 400
+        "/occupancy?allGuests=1&numberOfPremiumRooms=1"                        | 400
+        "/occupancy?allGuests=1&numberOfEconomyRooms=1"                        | 400
+        "/occupancy?allGuests=1&numberOfEconomyRooms=1&numberOfPremiumRooms=1" | 200
     }
 }
