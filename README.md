@@ -2,6 +2,9 @@
 
 Tool for hotels to optimize room occupancy and calculate profit.
 
+### Build status
+[![CircleCI](https://circleci.com/gh/zonkil/RoomOccupancyManager.svg?style=svg)](https://circleci.com/gh/zonkil/RoomOccupancyManager)
+
 ### Minimal requirements
 
 To run project you need:
