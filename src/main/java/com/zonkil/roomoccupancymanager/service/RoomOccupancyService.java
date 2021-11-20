@@ -1,10 +1,9 @@
 package com.zonkil.roomoccupancymanager.service;
 
+import com.zonkil.roomoccupancymanager.domain.AvailableRooms;
+import com.zonkil.roomoccupancymanager.domain.Guests;
 import com.zonkil.roomoccupancymanager.domain.RoomOccupancyCalculation;
 
-import java.math.BigDecimal;
-import java.util.List;
-
 public interface RoomOccupancyService {
-	RoomOccupancyCalculation calculateRoomOccupancy(int numberOfPremiumRooms, int numberOfEconomyRooms, List<BigDecimal> guests);
+	RoomOccupancyCalculation calculateRoomOccupancy(AvailableRooms availableRooms, Guests guests);
 }
