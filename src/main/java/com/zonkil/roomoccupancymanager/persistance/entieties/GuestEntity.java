@@ -21,7 +21,7 @@ public class GuestEntity {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@Column(name = "willingnes_to_pay")
+	@Column(name = "willingness_to_pay")
 	private BigDecimal willingnessToPay;
 
 	public GuestEntity(BigDecimal willingnessToPay) {
