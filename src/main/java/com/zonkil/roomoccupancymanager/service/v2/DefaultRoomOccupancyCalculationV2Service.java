@@ -46,7 +46,7 @@ public class DefaultRoomOccupancyCalculationV2Service implements RoomOccupancySe
 			long economyGuestCount) {
 		BigDecimal upgradedGuestsProfit = BigDecimal.ZERO;
 		long numberOfGuestToPromote = availableRooms.getNumberOfPremiumRooms() - premiumGuestCount;
-		if (numberOfGuestToPromote > 0 && economyGuestCount > availableRooms.getNumberOfEconomyRooms()) {
+		if (isUpgradePossible(numberOfGuestToPromote, economyGuestCount, availableRooms)) {
 			upgradedGuestsProfit = guestService.calculateProfit(GuestType.ECONOMY, numberOfGuestToPromote);
 		}
 		else {
@@ -54,6 +54,10 @@ public class DefaultRoomOccupancyCalculationV2Service implements RoomOccupancySe
 		}
 
 		return UpgradeData.of(upgradedGuestsProfit, numberOfGuestToPromote);
+	}
+
+	private boolean isUpgradePossible(long numberOfGuestToPromote, long economyGuestCount, AvailableRooms availableRooms) {
+		return numberOfGuestToPromote > 0 && economyGuestCount > availableRooms.getNumberOfEconomyRooms();
 	}
 
 	private BigDecimal calculatePremiumProfit(AvailableRooms availableRooms, UpgradeData upgradeData) {
