@@ -1,6 +1,7 @@
 package com.zonkil.roomoccupancymanager.web
 
 import com.zonkil.roomoccupancymanager.persistance.repositories.GuestRepository
+import com.zonkil.roomoccupancymanager.service.v2.RoomOccupancyServiceV2
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.boot.test.mock.mockito.MockBean
@@ -17,6 +18,8 @@ class RoomOccupancyV2ControllerTest extends Specification {
     MockMvc mockMvc
     @MockBean
     GuestRepository guestRepository
+    @MockBean
+    RoomOccupancyServiceV2 roomOccupancyServiceV2;
 
     void "testParameterValidation"() {
         given:
