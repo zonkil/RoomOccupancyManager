@@ -3,7 +3,6 @@ package com.zonkil.roomoccupancymanager.service;
 import com.zonkil.roomoccupancymanager.domain.AvailableRooms;
 import com.zonkil.roomoccupancymanager.domain.Guest;
 import com.zonkil.roomoccupancymanager.domain.Guests;
-import com.zonkil.roomoccupancymanager.domain.DefaultGuestsFactory;
 import com.zonkil.roomoccupancymanager.domain.RoomOccupancyCalculation;
 import org.springframework.stereotype.Service;
 
@@ -14,26 +13,22 @@ import java.util.List;
 public class DefaultRoomOccupancyService implements RoomOccupancyService {
 
 	private final GuestUpgradeService guestUpgradeService;
-	private final DefaultGuestsFactory guestsFactory;
 
-	public DefaultRoomOccupancyService(GuestUpgradeService guestUpgradeService, DefaultGuestsFactory guestsFactory) {
+	public DefaultRoomOccupancyService(GuestUpgradeService guestUpgradeService) {
 		this.guestUpgradeService = guestUpgradeService;
-		this.guestsFactory = guestsFactory;
 	}
 
 	@Override
-	public RoomOccupancyCalculation calculateRoomOccupancy(int numberOfPremiumRooms, int numberOfEconomyRooms,
-			List<BigDecimal> allGuests) {
-
-		Guests guests = guestsFactory.createGuests(allGuests);
-		AvailableRooms availableRooms = AvailableRooms.of(numberOfPremiumRooms, numberOfEconomyRooms);
+	public RoomOccupancyCalculation calculateRoomOccupancy(AvailableRooms availableRooms, Guests guests) {
 
 		guests = guestUpgradeService.upgradeGuestsIfNeeded(availableRooms, guests);
 
-		var premiumOccupancy = occupancy(numberOfPremiumRooms, guests.getPremiumGuestsNumber());
-		var economyOccupancy = occupancy(numberOfEconomyRooms, guests.getEconomyGuestsNumber());
-		var premiumMoney = calculateMoneyLimitedByRooms(guests.getPremiumGuests(), numberOfPremiumRooms);
-		var economyMoney = calculateMoneyLimitedByRooms(guests.getEconomyGuests(), numberOfEconomyRooms);
+		var premiumOccupancy = occupancy(availableRooms.getNumberOfPremiumRooms(), guests.getPremiumGuestsNumber());
+		var economyOccupancy = occupancy(availableRooms.getNumberOfEconomyRooms(), guests.getEconomyGuestsNumber());
+		var premiumMoney = calculateMoneyLimitedByRooms(guests.getPremiumGuests(),
+				availableRooms.getNumberOfPremiumRooms());
+		var economyMoney = calculateMoneyLimitedByRooms(guests.getEconomyGuests(),
+				availableRooms.getNumberOfEconomyRooms());
 
 		return RoomOccupancyCalculation.builder()
 									   .premiumOccupancy(premiumOccupancy)
