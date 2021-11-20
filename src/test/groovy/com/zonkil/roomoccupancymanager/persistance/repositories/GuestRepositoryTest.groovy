@@ -34,7 +34,7 @@ class GuestRepositoryTest extends Specification {
 
     def "calculatePremiumProfit"() {
         when:
-        def profit = guestRepository.countPremiumProfit(limitPrem)
+        def profit = guestRepository.calculateProfitFromPremiumRooms(limitPrem)
         then:
         profit == expectedPremiumProfit
 
@@ -51,7 +51,7 @@ class GuestRepositoryTest extends Specification {
 
     def "calculateEconomyProfit"() {
         when:
-        def profit = guestRepository.countProfitEconomy(limitEco)
+        def profit = guestRepository.calculateProfitFromEconomyRooms(limitEco)
         then:
         profit == expectedEconomyProfit
 

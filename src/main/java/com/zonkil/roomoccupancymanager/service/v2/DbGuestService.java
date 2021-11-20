@@ -29,9 +29,9 @@ public class DbGuestService implements GuestService {
 	public BigDecimal calculateProfit(GuestType guestType, long guestLimit) {
 		switch (guestType) {
 		case PREMIUM:
-			return guestRepository.countPremiumProfit(guestLimit);
+			return guestRepository.calculateProfitFromPremiumRooms(guestLimit);
 		case ECONOMY:
-			return guestRepository.countProfitEconomy(guestLimit);
+			return guestRepository.calculateProfitFromEconomyRooms(guestLimit);
 		}
 		return BigDecimal.ZERO;
 	}
