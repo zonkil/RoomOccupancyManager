@@ -25,7 +25,7 @@ class RoomOccupancyControllerIntegrationTest extends Specification {
         def result = mockMvc.perform(get(url)).andExpect(status().isOk()).andReturn()
 
         then:
-        result.getResponse().getContentAsString() == "{\"premiumOccupancy\":3,\"premiumTotalMoney\":738.0,\"economyOccupancy\":3,\"economyTotalMoney\":167.99}"
+        result.getResponse().getContentAsString() == "{\"premiumOccupancy\":3,\"premiumProfit\":738.0,\"economyOccupancy\":3,\"economyProfit\":167.99}"
 
         when:
         numPrem = 3
@@ -36,7 +36,7 @@ class RoomOccupancyControllerIntegrationTest extends Specification {
         def result2 = mockMvc.perform(get(url2)).andExpect(status().isOk()).andReturn()
 
         then:
-        result2.getResponse().getContentAsString() == "{\"premiumOccupancy\":0,\"premiumTotalMoney\":0,\"economyOccupancy\":3,\"economyTotalMoney\":6.0}"
+        result2.getResponse().getContentAsString() == "{\"premiumOccupancy\":0,\"premiumProfit\":0,\"economyOccupancy\":3,\"economyProfit\":6.0}"
     }
 
     def "should execute calculation twice with and without guest parameter"() {
@@ -48,7 +48,7 @@ class RoomOccupancyControllerIntegrationTest extends Specification {
         def result = mockMvc.perform(get(url)).andExpect(status().isOk()).andReturn()
 
         then:
-        result.getResponse().getContentAsString() == "{\"premiumOccupancy\":3,\"premiumTotalMoney\":738.00,\"economyOccupancy\":3,\"economyTotalMoney\":167.99}"
+        result.getResponse().getContentAsString() == "{\"premiumOccupancy\":3,\"premiumProfit\":738.00,\"economyOccupancy\":3,\"economyProfit\":167.99}"
 
         when:
         numPrem = 3
@@ -59,6 +59,6 @@ class RoomOccupancyControllerIntegrationTest extends Specification {
         def result2 = mockMvc.perform(get(url2)).andExpect(status().isOk()).andReturn()
 
         then:
-        result2.getResponse().getContentAsString() == "{\"premiumOccupancy\":0,\"premiumTotalMoney\":0,\"economyOccupancy\":3,\"economyTotalMoney\":6.0}"
+        result2.getResponse().getContentAsString() == "{\"premiumOccupancy\":0,\"premiumProfit\":0,\"economyOccupancy\":3,\"economyProfit\":6.0}"
     }
 }
