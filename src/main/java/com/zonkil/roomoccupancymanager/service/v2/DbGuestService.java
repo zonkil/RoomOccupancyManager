@@ -21,9 +21,9 @@ public class DbGuestService implements GuestService {
 	public long countGuests(GuestType guestType) {
 		switch (guestType) {
 		case PREMIUM:
-			return (int) guestRepository.countAllByWillingnessToPayIsGreaterThanEqual(threshold);
+			return guestRepository.countAllByWillingnessToPayIsGreaterThanEqual(threshold);
 		case ECONOMY:
-			return (int) guestRepository.countAllByWillingnessToPayIsLessThan(threshold);
+			return guestRepository.countAllByWillingnessToPayIsLessThan(threshold);
 		}
 		return 0;
 	}

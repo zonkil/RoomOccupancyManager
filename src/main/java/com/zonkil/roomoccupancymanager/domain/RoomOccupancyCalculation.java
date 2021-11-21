@@ -15,8 +15,8 @@ public class RoomOccupancyCalculation {
 																				.economyTotalMoney(BigDecimal.ZERO)
 																				.build();
 
-	private int premiumOccupancy;
-	private BigDecimal premiumTotalMoney;
-	private int economyOccupancy;
-	private BigDecimal economyTotalMoney;
+	long premiumOccupancy;
+	BigDecimal premiumTotalMoney;
+	long economyOccupancy;
+	BigDecimal economyTotalMoney;
 }

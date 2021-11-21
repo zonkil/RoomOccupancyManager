@@ -43,9 +43,9 @@ public class DefaultRoomOccupancyService implements RoomOccupancyService {
 				economyGuestCount - upgradeData.numberOfGuestToPromote);
 
 		return RoomOccupancyCalculation.builder()
-									   .premiumOccupancy((int) premiumOccupancy)
+									   .premiumOccupancy(premiumOccupancy)
 									   .premiumTotalMoney(premiumProfit)
-									   .economyOccupancy((int) economyOccupancy)
+									   .economyOccupancy(economyOccupancy)
 									   .economyTotalMoney(economyProfit)
 									   .build();
 	}
