@@ -6,6 +6,7 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.web.servlet.MockMvc
 import spock.lang.Specification
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 
 @SpringBootTest
@@ -22,10 +23,16 @@ class RoomOccupancyControllerIntegrationTest extends Specification {
         def guests = "23.0, 45.0, 155.0, 374.0, 22.0, 99.99, 100.0, 101.0, 115.0, 209.0"
         def url = "/occupancy?numberOfPremiumRooms=${numPrem}&numberOfEconomyRooms=${numEcon}&guests=${guests}".toString()
         when:
-        def result = mockMvc.perform(get(url)).andExpect(status().isOk()).andReturn()
+        def result = mockMvc.perform(get(url))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("\$.premiumOccupancy").value(3))
+                .andExpect(jsonPath("\$.premiumProfit").value(738.0))
+                .andExpect(jsonPath("\$.economyOccupancy").value(3))
+                .andExpect(jsonPath("\$.economyProfit").value(167.99))
+                .andReturn()
 
         then:
-        result.getResponse().getContentAsString() == "{\"premiumOccupancy\":3,\"premiumProfit\":738.0,\"economyOccupancy\":3,\"economyProfit\":167.99}"
+        result != null
 
         when:
         numPrem = 3
@@ -33,10 +40,16 @@ class RoomOccupancyControllerIntegrationTest extends Specification {
         guests = "1.0,2.0,3.0"
         def url2 = "/occupancy?numberOfPremiumRooms=${numPrem}&numberOfEconomyRooms=${numEcon}&guests=${guests}".toString()
 
-        def result2 = mockMvc.perform(get(url2)).andExpect(status().isOk()).andReturn()
+        def result2 = mockMvc.perform(get(url2))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("\$.premiumOccupancy").value(0))
+                .andExpect(jsonPath("\$.premiumProfit").value(0))
+                .andExpect(jsonPath("\$.economyOccupancy").value(3))
+                .andExpect(jsonPath("\$.economyProfit").value(6.0))
+                .andReturn()
 
         then:
-        result2.getResponse().getContentAsString() == "{\"premiumOccupancy\":0,\"premiumProfit\":0,\"economyOccupancy\":3,\"economyProfit\":6.0}"
+        result2 != null
     }
 
     def "should execute calculation twice with and without guest parameter"() {
@@ -45,10 +58,16 @@ class RoomOccupancyControllerIntegrationTest extends Specification {
         def numEcon = 3
         def url = "/occupancy?numberOfPremiumRooms=${numPrem}&numberOfEconomyRooms=${numEcon}".toString()
         when:
-        def result = mockMvc.perform(get(url)).andExpect(status().isOk()).andReturn()
+        def result = mockMvc.perform(get(url))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("\$.premiumOccupancy").value(3))
+                .andExpect(jsonPath("\$.premiumProfit").value(738.0))
+                .andExpect(jsonPath("\$.economyOccupancy").value(3))
+                .andExpect(jsonPath("\$.economyProfit").value(167.99))
+                .andReturn()
 
         then:
-        result.getResponse().getContentAsString() == "{\"premiumOccupancy\":3,\"premiumProfit\":738.00,\"economyOccupancy\":3,\"economyProfit\":167.99}"
+        result != null
 
         when:
         numPrem = 3
@@ -56,9 +75,15 @@ class RoomOccupancyControllerIntegrationTest extends Specification {
         def guests = "1.0,2.0,3.0"
         def url2 = "/occupancy?numberOfPremiumRooms=${numPrem}&numberOfEconomyRooms=${numEcon}&guests=${guests}".toString()
 
-        def result2 = mockMvc.perform(get(url2)).andExpect(status().isOk()).andReturn()
+        def result2 = mockMvc.perform(get(url2))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("\$.premiumOccupancy").value(0))
+                .andExpect(jsonPath("\$.premiumProfit").value(0))
+                .andExpect(jsonPath("\$.economyOccupancy").value(3))
+                .andExpect(jsonPath("\$.economyProfit").value(6.0))
+                .andReturn()
 
         then:
-        result2.getResponse().getContentAsString() == "{\"premiumOccupancy\":0,\"premiumProfit\":0,\"economyOccupancy\":3,\"economyProfit\":6.0}"
+        result2 != null
     }
 }
