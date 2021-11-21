@@ -15,6 +15,7 @@ To run project you need:
 
 * Spring boot
 * Gradle 
+* H2 Database
 * Spock 
 * Swagger
 
@@ -25,7 +26,7 @@ To run project execute
 ```
 
 Once application is working you can access swagger ui
-> http://localhost:8080/swagger-ui/
+> http://localhost:8080/swagger-ui.html
  
 ### Run test
 Tu run test execute
@@ -33,3 +34,12 @@ Tu run test execute
 ./gradlew test
 ```
 
+## Description
+
+Service expose one endpoint to calculate room occupancy. There are tree parameters:
+* numberOfPremiumRooms (required)
+* numberOfEconomyRooms (required)
+* guests (optional)
+
+If parameter guests is present then calculation is done based on provided list of guests
+If parameter guests is not provided then calculation is done based on data in database (there is data from assignment)
