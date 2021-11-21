@@ -13,6 +13,8 @@ class GuestRepositoryTest extends Specification {
     @Autowired
     GuestRepository guestRepository
 
+    BigDecimal THRESHOLD = BigDecimal.valueOf(100.0)
+
     void setup() {
         def guests = [23.0, 45.0, 155.0, 374.0, 22.0, 99.99, 100.0, 101.0, 115.0, 209.0].collect { it -> new GuestEntity(it) }
         guestRepository.saveAll(guests)
@@ -20,21 +22,21 @@ class GuestRepositoryTest extends Specification {
 
     def "countPremiumGuests"() {
         when:
-        def count = guestRepository.countAllByWillingnessToPayIsGreaterThanEqual(BigDecimal.valueOf(100.0));
+        def count = guestRepository.countAllByWillingnessToPayIsGreaterThanEqual(THRESHOLD)
         then:
         count == 6
     }
 
     def "countEconomyGuests"() {
         when:
-        def count = guestRepository.countAllByWillingnessToPayIsLessThan(BigDecimal.valueOf(100.0));
+        def count = guestRepository.countAllByWillingnessToPayIsLessThan(THRESHOLD)
         then:
         count == 4
     }
 
     def "calculatePremiumProfit"() {
         when:
-        def profit = guestRepository.calculateProfitFromPremiumRooms(limitPrem)
+        def profit = guestRepository.calculateProfitFromPremiumRooms(THRESHOLD, limitPrem)
         then:
         profit == expectedPremiumProfit
 
@@ -51,7 +53,7 @@ class GuestRepositoryTest extends Specification {
 
     def "calculateEconomyProfit"() {
         when:
-        def profit = guestRepository.calculateProfitFromEconomyRooms(limitEco)
+        def profit = guestRepository.calculateProfitFromEconomyRooms(THRESHOLD, limitEco)
         then:
         profit == expectedEconomyProfit
 
