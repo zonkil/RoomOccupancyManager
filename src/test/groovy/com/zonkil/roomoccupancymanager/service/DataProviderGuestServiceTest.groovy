@@ -12,7 +12,7 @@ class DataProviderGuestServiceTest extends Specification {
     def "testCountingGuests"() {
         given:
         guestDataProvider.getGuestData() >> allGuests
-        def dataProviderGuestService = new DataProviderGuestService(guestDataProvider)
+        def dataProviderGuestService = new DataProviderGuestService(guestDataProvider, 100.0)
         when:
         def premCount = dataProviderGuestService.countGuests(GuestType.PREMIUM)
         def econCount = dataProviderGuestService.countGuests(GuestType.ECONOMY)
@@ -32,7 +32,7 @@ class DataProviderGuestServiceTest extends Specification {
     def "testCalculateProfit"() {
         given:
         guestDataProvider.getGuestData() >> allGuests
-        def dataProviderGuestService = new DataProviderGuestService(guestDataProvider)
+        def dataProviderGuestService = new DataProviderGuestService(guestDataProvider, 100.0)
         when:
         def premProfit = dataProviderGuestService.calculateProfit(GuestType.PREMIUM, limitPrem)
         def econProfit = dataProviderGuestService.calculateProfit(GuestType.ECONOMY, limitEco)

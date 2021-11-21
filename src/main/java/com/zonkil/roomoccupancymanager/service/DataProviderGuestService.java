@@ -2,8 +2,8 @@ package com.zonkil.roomoccupancymanager.service;
 
 import com.zonkil.roomoccupancymanager.service.v2.GuestService;
 import com.zonkil.roomoccupancymanager.service.v2.GuestType;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.web.context.annotation.RequestScope;
 
 import java.math.BigDecimal;
 import java.util.Comparator;
@@ -14,9 +14,12 @@ import static java.util.function.Predicate.not;
 public class DataProviderGuestService implements GuestService {
 
 	private final GuestDataProvider guestDataProvider;
+	private final BigDecimal threshold;
 
-	public DataProviderGuestService(GuestDataProvider guestDataProvider) {
+	public DataProviderGuestService(GuestDataProvider guestDataProvider,
+			@Value("${premium-guest.threshold}") BigDecimal threshold) {
 		this.guestDataProvider = guestDataProvider;
+		this.threshold = threshold;
 	}
 
 	@Override
@@ -52,6 +55,6 @@ public class DataProviderGuestService implements GuestService {
 	}
 
 	private boolean isPremiumGuest(BigDecimal money) {
-		return BigDecimal.valueOf(100).compareTo(money) <= 0;
+		return threshold.compareTo(money) <= 0;
 	}
 }
