@@ -1,15 +1,21 @@
-package com.zonkil.roomoccupancymanager.service.v2
+package com.zonkil.roomoccupancymanager.service
 
+import com.zonkil.roomoccupancymanager.service.v2.GuestType
 import spock.lang.Specification
+import spock.lang.Subject
 
-class TestGuestServiceTest extends Specification {
+@Subject(DataProviderGuestService.class)
+class DataProviderGuestServiceTest extends Specification {
+
+    GuestDataProvider guestDataProvider = Mock()
 
     def "testCountingGuests"() {
         given:
-        def testGuestService = new TestGuestService(allGuests)
+        guestDataProvider.getGuestData() >> allGuests
+        def dataProviderGuestService = new DataProviderGuestService(guestDataProvider)
         when:
-        def premCount = testGuestService.countGuests(GuestType.PREMIUM)
-        def econCount = testGuestService.countGuests(GuestType.ECONOMY)
+        def premCount = dataProviderGuestService.countGuests(GuestType.PREMIUM)
+        def econCount = dataProviderGuestService.countGuests(GuestType.ECONOMY)
         then:
         premCount == expectedPremiumGuestCount
         econCount == expectedEconomyGuestCount
@@ -25,10 +31,11 @@ class TestGuestServiceTest extends Specification {
 
     def "testCalculateProfit"() {
         given:
-        def testGuestService = new TestGuestService(allGuests)
+        guestDataProvider.getGuestData() >> allGuests
+        def dataProviderGuestService = new DataProviderGuestService(guestDataProvider)
         when:
-        def premProfit = testGuestService.calculateProfit(GuestType.PREMIUM, limitPrem)
-        def econProfit = testGuestService.calculateProfit(GuestType.ECONOMY, limitEco)
+        def premProfit = dataProviderGuestService.calculateProfit(GuestType.PREMIUM, limitPrem)
+        def econProfit = dataProviderGuestService.calculateProfit(GuestType.ECONOMY, limitEco)
         then:
         premProfit == expectedPremiumProfit
         econProfit == expectedEconomyProfit

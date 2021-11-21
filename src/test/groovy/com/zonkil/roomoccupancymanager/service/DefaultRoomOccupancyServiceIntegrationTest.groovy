@@ -1,7 +1,6 @@
 package com.zonkil.roomoccupancymanager.service
 
 import com.zonkil.roomoccupancymanager.domain.AvailableRooms
-import com.zonkil.roomoccupancymanager.domain.DefaultGuestsFactory
 import spock.lang.Specification
 import spock.lang.Subject
 
@@ -9,21 +8,23 @@ class DefaultRoomOccupancyServiceIntegrationTest extends Specification {
 
     @Subject
     DefaultRoomOccupancyService defaultRoomOccupancyService
-    DefaultGuestsFactory guestFactory
+    GuestDataProvider guestDataProvider
+    DataProviderGuestService dataProviderGuestService
 
     void setup() {
-        def threshold = 100.0
-        def emptyPremiumRoomUpgradeService = new EmptyPremiumRoomUpgradeService(threshold)
-        guestFactory = new DefaultGuestsFactory(emptyPremiumRoomUpgradeService)
-        defaultRoomOccupancyService = new DefaultRoomOccupancyService(emptyPremiumRoomUpgradeService)
+        guestDataProvider = new GuestDataProvider()
+        dataProviderGuestService = new DataProviderGuestService(guestDataProvider)
+        GuestServiceStrategy strategy = Mock()
+        strategy.get() >> dataProviderGuestService
+        defaultRoomOccupancyService = new DefaultRoomOccupancyService(strategy)
     }
 
     def "shouldCalculateRoomOccupancy"() {
         given:
+        guestDataProvider.initialize(allGuests)
         def availableRooms = AvailableRooms.of(numPremium, numEconomy)
-        def guests = guestFactory.createGuests(allGuests)
         when:
-        def calculation = defaultRoomOccupancyService.calculateRoomOccupancy(availableRooms, guests)
+        def calculation = defaultRoomOccupancyService.calculateRoomOccupancy(availableRooms)
 
         then:
         calculation != null
@@ -36,7 +37,7 @@ class DefaultRoomOccupancyServiceIntegrationTest extends Specification {
 
 
         where:
-        numPremium | numEconomy | allGuests                                                              | premOcc | premMoney | ecoOcc | ecoMonney
+        numPremium | numEconomy | allGuests                                                           | premOcc | premMoney | ecoOcc | ecoMonney
         3          | 3          | [23.0, 45.0, 155.0, 374.0, 22.0, 99.99, 100.0, 101.0, 115.0, 209.0] | 3       | 738.0     | 3      | 167.99
         7          | 5          | [23.0, 45.0, 155.0, 374.0, 22.0, 99.99, 100.0, 101.0, 115.0, 209.0] | 6       | 1054.0    | 4      | 189.99
         2          | 7          | [23.0, 45.0, 155.0, 374.0, 22.0, 99.99, 100.0, 101.0, 115.0, 209.0] | 2       | 583.0     | 4      | 189.99

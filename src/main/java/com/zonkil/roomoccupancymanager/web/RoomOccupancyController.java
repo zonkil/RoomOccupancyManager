@@ -1,7 +1,7 @@
 package com.zonkil.roomoccupancymanager.web;
 
 import com.zonkil.roomoccupancymanager.domain.AvailableRooms;
-import com.zonkil.roomoccupancymanager.domain.GuestsFactory;
+import com.zonkil.roomoccupancymanager.service.GuestDataProvider;
 import com.zonkil.roomoccupancymanager.service.RoomOccupancyService;
 import com.zonkil.roomoccupancymanager.web.dto.RoomOccupancyCalculationResponseDto;
 import io.swagger.v3.oas.annotations.Operation;
@@ -31,28 +31,30 @@ public class RoomOccupancyController {
 
 	private final RoomOccupancyService roomOccupancyService;
 	private final ConversionService conversionService;
-	private final GuestsFactory guestsFactory;
+	private final GuestDataProvider guestDataProvider;
 
 	public RoomOccupancyController(RoomOccupancyService roomOccupancyService, ConversionService conversionService,
-			GuestsFactory guestsFactory) {
+			GuestDataProvider guestDataProvider) {
 		this.roomOccupancyService = roomOccupancyService;
 		this.conversionService = conversionService;
-		this.guestsFactory = guestsFactory;
+		this.guestDataProvider = guestDataProvider;
 	}
 
-	@Operation(summary = "Calculate room occupancy based on available rooms and guest list", description = "Calculate room occupancy based on available rooms and guest list")
+	@Operation(summary = "Calculate room occupancy based on available rooms and guest list", description = "Calculate room occupancy based on available rooms. If guest list is provided in parameter calculation will be done based on this data. If parameter guest is not provided, calculation will be done based on data in database")
 	@ApiResponses(value = {
 			@ApiResponse(responseCode = "200", description = "successful operation", content = @Content(schema = @Schema(implementation = RoomOccupancyCalculationResponseDto.class))),
 			@ApiResponse(responseCode = "400", description = "bad request") })
 	@GetMapping
 	public RoomOccupancyCalculationResponseDto calculateOccupancy(
-			@Parameter(description = "Number of empty premium rooms", example = "3") @RequestParam @Min(0) int numberOfPremiumRooms,
-			@Parameter(description = "Number of empty economy rooms", example = "3") @RequestParam @Min(0) int numberOfEconomyRooms,
-			@Parameter(description = "List of people represented as a numbers. Each number is amount of money guest will pay for a room", example = "[23, 45, 155, 374, 22, 99.99, 100, 101, 115, 209]") @RequestParam List<@Min(0) BigDecimal> allGuests) {
+			@Parameter(description = "Number of empty premium rooms", example = "3", required = true) @RequestParam @Min(0) int numberOfPremiumRooms,
+			@Parameter(description = "Number of empty economy rooms", example = "3", required = true) @RequestParam @Min(0) int numberOfEconomyRooms,
+			@Parameter(description = "List of people represented as a numbers. Each number is amount of money guest will pay for a room", example = "[23, 45, 155, 374, 22, 99.99, 100, 101, 115, 209]", required = false) @RequestParam(required = false, name = "guests") List<@Min(0) BigDecimal> allGuests) {
 
-		var guests = guestsFactory.createGuests(allGuests);
+		if (allGuests != null) {
+			guestDataProvider.initialize(allGuests);
+		}
 		var calculation = roomOccupancyService.calculateRoomOccupancy(
-				AvailableRooms.of(numberOfPremiumRooms, numberOfEconomyRooms), guests);
+				AvailableRooms.of(numberOfPremiumRooms, numberOfEconomyRooms));
 
 		return conversionService.convert(calculation, RoomOccupancyCalculationResponseDto.class);
 	}
