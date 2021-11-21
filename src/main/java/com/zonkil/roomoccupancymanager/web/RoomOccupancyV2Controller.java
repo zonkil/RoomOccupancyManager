@@ -1,7 +1,7 @@
 package com.zonkil.roomoccupancymanager.web;
 
 import com.zonkil.roomoccupancymanager.domain.AvailableRooms;
-import com.zonkil.roomoccupancymanager.service.v2.RoomOccupancyServiceV2;
+import com.zonkil.roomoccupancymanager.service.RoomOccupancyService;
 import com.zonkil.roomoccupancymanager.web.dto.RoomOccupancyCalculationResponseDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -26,12 +26,12 @@ import javax.validation.constraints.Min;
 @Tag(name = "RoomOccupancyV2", description = "RoomOccupancy API that use database as source of data")
 public class RoomOccupancyV2Controller {
 
-	private final RoomOccupancyServiceV2 roomOccupancyServiceV2;
+	private final RoomOccupancyService roomOccupancyService;
 	private final ConversionService conversionService;
 
-	public RoomOccupancyV2Controller(RoomOccupancyServiceV2 roomOccupancyServiceV2,
+	public RoomOccupancyV2Controller(RoomOccupancyService roomOccupancyService,
 			ConversionService conversionService) {
-		this.roomOccupancyServiceV2 = roomOccupancyServiceV2;
+		this.roomOccupancyService = roomOccupancyService;
 		this.conversionService = conversionService;
 	}
 
@@ -44,7 +44,7 @@ public class RoomOccupancyV2Controller {
 			@Parameter(description = "Number of empty premium rooms", example = "3") @RequestParam @Min(0) int numberOfPremiumRooms,
 			@Parameter(description = "Number of empty economy rooms", example = "3") @RequestParam @Min(0) int numberOfEconomyRooms) {
 
-		var calculation = roomOccupancyServiceV2.calculateRoomOccupancy(
+		var calculation = roomOccupancyService.calculateRoomOccupancy(
 				AvailableRooms.of(numberOfPremiumRooms, numberOfEconomyRooms));
 		return conversionService.convert(calculation, RoomOccupancyCalculationResponseDto.class);
 	}

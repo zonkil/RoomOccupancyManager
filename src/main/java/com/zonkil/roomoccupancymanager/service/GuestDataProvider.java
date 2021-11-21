@@ -1,7 +1,6 @@
 package com.zonkil.roomoccupancymanager.service;
 
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.context.annotation.RequestScope;
 
 import java.math.BigDecimal;
@@ -28,5 +27,9 @@ public class GuestDataProvider {
 			throw new IllegalStateException("Data provider not initialized");
 		}
 		return guestData;
+	}
+
+	public synchronized boolean isInitialized() {
+		return guestData != null;
 	}
 }

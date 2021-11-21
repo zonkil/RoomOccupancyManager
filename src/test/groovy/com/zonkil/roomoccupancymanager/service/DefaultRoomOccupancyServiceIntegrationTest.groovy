@@ -14,7 +14,9 @@ class DefaultRoomOccupancyServiceIntegrationTest extends Specification {
     void setup() {
         guestDataProvider = new GuestDataProvider()
         dataProviderGuestService = new DataProviderGuestService(guestDataProvider)
-        defaultRoomOccupancyService = new DefaultRoomOccupancyService(dataProviderGuestService)
+        GuestServiceStrategy strategy = Mock()
+        strategy.get() >> dataProviderGuestService
+        defaultRoomOccupancyService = new DefaultRoomOccupancyService(strategy)
     }
 
     def "shouldCalculateRoomOccupancy"() {

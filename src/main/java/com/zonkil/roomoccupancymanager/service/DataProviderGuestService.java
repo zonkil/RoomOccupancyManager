@@ -3,6 +3,7 @@ package com.zonkil.roomoccupancymanager.service;
 import com.zonkil.roomoccupancymanager.service.v2.GuestService;
 import com.zonkil.roomoccupancymanager.service.v2.GuestType;
 import org.springframework.stereotype.Service;
+import org.springframework.web.context.annotation.RequestScope;
 
 import java.math.BigDecimal;
 import java.util.Comparator;
