@@ -15,7 +15,7 @@ class RoomOccupancyControllerIntegrationTest extends Specification {
     @Autowired
     MockMvc mockMvc
 
-    def "shouldDoCalculation"() {
+    def "should execute calculation twice (test if DataProvider works correctly)"() {
         given:
         def numPrem = 3
         def numEcon = 3
@@ -26,5 +26,16 @@ class RoomOccupancyControllerIntegrationTest extends Specification {
 
         then:
         result.getResponse().getContentAsString() == "{\"premiumOccupancy\":3,\"premiumTotalMoney\":738.0,\"economyOccupancy\":3,\"economyTotalMoney\":167.99}"
+
+        when:
+        numPrem = 3
+        numEcon = 3
+        guests = "1.0,2.0,3.0"
+        def url2 = "/occupancy?numberOfPremiumRooms=${numPrem}&numberOfEconomyRooms=${numEcon}&allGuests=${guests}".toString()
+
+        def result2 = mockMvc.perform(get(url2)).andExpect(status().isOk()).andReturn()
+
+        then:
+        result2.getResponse().getContentAsString() == "{\"premiumOccupancy\":0,\"premiumTotalMoney\":0,\"economyOccupancy\":3,\"economyTotalMoney\":6.0}"
     }
 }

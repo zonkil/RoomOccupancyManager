@@ -9,21 +9,25 @@ class DefaultRoomOccupancyServiceIntegrationTest extends Specification {
 
     @Subject
     DefaultRoomOccupancyService defaultRoomOccupancyService
+    EmptyPremiumRoomUpgradeService emptyPremiumRoomUpgradeService
     DefaultGuestsFactory guestFactory
+    GuestDataProvider guestDataProvider
 
     void setup() {
         def threshold = 100.0
-        def emptyPremiumRoomUpgradeService = new EmptyPremiumRoomUpgradeService(threshold)
+        emptyPremiumRoomUpgradeService = new EmptyPremiumRoomUpgradeService(threshold)
         guestFactory = new DefaultGuestsFactory(emptyPremiumRoomUpgradeService)
-        defaultRoomOccupancyService = new DefaultRoomOccupancyService(emptyPremiumRoomUpgradeService)
     }
 
     def "shouldCalculateRoomOccupancy"() {
         given:
+        guestDataProvider = new GuestDataProvider()
+        defaultRoomOccupancyService = new DefaultRoomOccupancyService(emptyPremiumRoomUpgradeService, guestDataProvider, guestFactory)
+        guestDataProvider.initialize(allGuests)
+
         def availableRooms = AvailableRooms.of(numPremium, numEconomy)
-        def guests = guestFactory.createGuests(allGuests)
         when:
-        def calculation = defaultRoomOccupancyService.calculateRoomOccupancy(availableRooms, guests)
+        def calculation = defaultRoomOccupancyService.calculateRoomOccupancy(availableRooms)
 
         then:
         calculation != null
@@ -36,7 +40,7 @@ class DefaultRoomOccupancyServiceIntegrationTest extends Specification {
 
 
         where:
-        numPremium | numEconomy | allGuests                                                              | premOcc | premMoney | ecoOcc | ecoMonney
+        numPremium | numEconomy | allGuests                                                           | premOcc | premMoney | ecoOcc | ecoMonney
         3          | 3          | [23.0, 45.0, 155.0, 374.0, 22.0, 99.99, 100.0, 101.0, 115.0, 209.0] | 3       | 738.0     | 3      | 167.99
         7          | 5          | [23.0, 45.0, 155.0, 374.0, 22.0, 99.99, 100.0, 101.0, 115.0, 209.0] | 6       | 1054.0    | 4      | 189.99
         2          | 7          | [23.0, 45.0, 155.0, 374.0, 22.0, 99.99, 100.0, 101.0, 115.0, 209.0] | 2       | 583.0     | 4      | 189.99

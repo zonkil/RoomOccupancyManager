@@ -2,6 +2,7 @@ package com.zonkil.roomoccupancymanager.web
 
 import com.zonkil.roomoccupancymanager.domain.GuestsFactory
 import com.zonkil.roomoccupancymanager.persistance.repositories.GuestRepository
+import com.zonkil.roomoccupancymanager.service.GuestDataProvider
 import com.zonkil.roomoccupancymanager.service.RoomOccupancyService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
@@ -19,7 +20,7 @@ class RoomOccupancyControllerTest extends Specification {
     RoomOccupancyService roomOccupancyService
 
     @MockBean
-    GuestsFactory guestsFactory
+    GuestDataProvider guestDataProvider
 
     @MockBean
     GuestRepository guestRepository

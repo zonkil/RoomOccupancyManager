@@ -1,8 +1,8 @@
 package com.zonkil.roomoccupancymanager.service;
 
 import com.zonkil.roomoccupancymanager.domain.AvailableRooms;
+import com.zonkil.roomoccupancymanager.domain.DefaultGuestsFactory;
 import com.zonkil.roomoccupancymanager.domain.Guest;
-import com.zonkil.roomoccupancymanager.domain.Guests;
 import com.zonkil.roomoccupancymanager.domain.RoomOccupancyCalculation;
 import org.springframework.stereotype.Service;
 
@@ -13,14 +13,21 @@ import java.util.List;
 public class DefaultRoomOccupancyService implements RoomOccupancyService {
 
 	private final GuestUpgradeService guestUpgradeService;
+	private final DefaultGuestsFactory defaultGuestsFactory;
+	private final GuestDataProvider guestDataProvider;
 
-	public DefaultRoomOccupancyService(GuestUpgradeService guestUpgradeService) {
+	public DefaultRoomOccupancyService(GuestUpgradeService guestUpgradeService, GuestDataProvider guestDataProvider,
+			DefaultGuestsFactory defaultGuestsFactory) {
 		this.guestUpgradeService = guestUpgradeService;
+		this.defaultGuestsFactory = defaultGuestsFactory;
+		this.guestDataProvider = guestDataProvider;
 	}
 
 	@Override
-	public RoomOccupancyCalculation calculateRoomOccupancy(AvailableRooms availableRooms, Guests guests) {
+	public RoomOccupancyCalculation calculateRoomOccupancy(AvailableRooms availableRooms) {
 
+		var guestData = guestDataProvider.getGuestData();
+		var guests = defaultGuestsFactory.createGuests(guestData);
 		guests = guestUpgradeService.upgradeGuestsIfNeeded(availableRooms, guests);
 
 		var premiumOccupancy = occupancy(availableRooms.getNumberOfPremiumRooms(), guests.getPremiumGuestsNumber());

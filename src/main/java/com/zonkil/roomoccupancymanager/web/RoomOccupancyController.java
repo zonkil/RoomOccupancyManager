@@ -2,6 +2,7 @@ package com.zonkil.roomoccupancymanager.web;
 
 import com.zonkil.roomoccupancymanager.domain.AvailableRooms;
 import com.zonkil.roomoccupancymanager.domain.GuestsFactory;
+import com.zonkil.roomoccupancymanager.service.GuestDataProvider;
 import com.zonkil.roomoccupancymanager.service.RoomOccupancyService;
 import com.zonkil.roomoccupancymanager.web.dto.RoomOccupancyCalculationResponseDto;
 import io.swagger.v3.oas.annotations.Operation;
@@ -31,13 +32,13 @@ public class RoomOccupancyController {
 
 	private final RoomOccupancyService roomOccupancyService;
 	private final ConversionService conversionService;
-	private final GuestsFactory guestsFactory;
+	private final GuestDataProvider guestDataProvider;
 
 	public RoomOccupancyController(RoomOccupancyService roomOccupancyService, ConversionService conversionService,
-			GuestsFactory guestsFactory) {
+			GuestDataProvider guestDataProvider) {
 		this.roomOccupancyService = roomOccupancyService;
 		this.conversionService = conversionService;
-		this.guestsFactory = guestsFactory;
+		this.guestDataProvider = guestDataProvider;
 	}
 
 	@Operation(summary = "Calculate room occupancy based on available rooms and guest list", description = "Calculate room occupancy based on available rooms and guest list")
@@ -50,9 +51,9 @@ public class RoomOccupancyController {
 			@Parameter(description = "Number of empty economy rooms", example = "3") @RequestParam @Min(0) int numberOfEconomyRooms,
 			@Parameter(description = "List of people represented as a numbers. Each number is amount of money guest will pay for a room", example = "[23, 45, 155, 374, 22, 99.99, 100, 101, 115, 209]") @RequestParam List<@Min(0) BigDecimal> allGuests) {
 
-		var guests = guestsFactory.createGuests(allGuests);
+		guestDataProvider.initialize(allGuests);
 		var calculation = roomOccupancyService.calculateRoomOccupancy(
-				AvailableRooms.of(numberOfPremiumRooms, numberOfEconomyRooms), guests);
+				AvailableRooms.of(numberOfPremiumRooms, numberOfEconomyRooms));
 
 		return conversionService.convert(calculation, RoomOccupancyCalculationResponseDto.class);
 	}
