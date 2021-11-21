@@ -29,7 +29,7 @@ class RoomOccupancyControllerTest extends Specification {
 
     void "testParameterValidation"() {
         given:
-        def url = "/occupancy?numberOfPremiumRooms=${numPrem}&numberOfEconomyRooms=${numEcon}&allGuests=${guests}".toString()
+        def url = "/occupancy?numberOfPremiumRooms=${numPrem}&numberOfEconomyRooms=${numEcon}&guests=${guests}".toString()
         expect:
         mockMvc.perform(
                 get(url)).andExpect(status().is(expectedStatus))
@@ -60,18 +60,18 @@ class RoomOccupancyControllerTest extends Specification {
                 .andReturn()
 
         where:
-        url                                                           | expectedStatus
-        "/occupancy"                                                           | 400
-        "/occupancy?"                                                          | 400
-        "/occupancy?numberOfPremiumRooms=1"                                    | 400
-        "/occupancy?numberOfPremiumRooms=1&numberOfEconomyRooms=1"             | 400
-        "/occupancy?numberOfPremiumRooms=1&allGuests=1"                        | 400
-        "/occupancy?numberOfEconomyRooms=1"                                    | 400
-        "/occupancy?numberOfEconomyRooms=1&numberOfPremiumRooms=1"             | 400
-        "/occupancy?numberOfEconomyRooms=1&allGuests=1"                        | 400
-        "/occupancy?allGuests=1"                                               | 400
-        "/occupancy?allGuests=1&numberOfPremiumRooms=1"                        | 400
-        "/occupancy?allGuests=1&numberOfEconomyRooms=1"                        | 400
-        "/occupancy?allGuests=1&numberOfEconomyRooms=1&numberOfPremiumRooms=1" | 200
+        url                                                                 | expectedStatus
+        "/occupancy"                                                        | 400
+        "/occupancy?"                                                       | 400
+        "/occupancy?numberOfPremiumRooms=1"                                 | 400
+        "/occupancy?numberOfPremiumRooms=1&numberOfEconomyRooms=1"          | 200
+        "/occupancy?numberOfPremiumRooms=1&guests=1"                        | 400
+        "/occupancy?numberOfEconomyRooms=1"                                 | 400
+        "/occupancy?numberOfEconomyRooms=1&numberOfPremiumRooms=1"          | 200
+        "/occupancy?numberOfEconomyRooms=1&guests=1"                        | 400
+        "/occupancy?guests=1"                                               | 400
+        "/occupancy?guests=1&numberOfPremiumRooms=1"                        | 400
+        "/occupancy?guests=1&numberOfEconomyRooms=1"                        | 400
+        "/occupancy?guests=1&numberOfEconomyRooms=1&numberOfPremiumRooms=1" | 200
     }
 }
