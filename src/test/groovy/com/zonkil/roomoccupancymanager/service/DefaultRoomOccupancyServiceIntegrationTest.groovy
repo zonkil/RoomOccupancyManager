@@ -9,22 +9,18 @@ class DefaultRoomOccupancyServiceIntegrationTest extends Specification {
 
     @Subject
     DefaultRoomOccupancyService defaultRoomOccupancyService
-    EmptyPremiumRoomUpgradeService emptyPremiumRoomUpgradeService
-    DefaultGuestsFactory guestFactory
     GuestDataProvider guestDataProvider
+    DataProviderGuestService dataProviderGuestService
 
     void setup() {
-        def threshold = 100.0
-        emptyPremiumRoomUpgradeService = new EmptyPremiumRoomUpgradeService(threshold)
-        guestFactory = new DefaultGuestsFactory(emptyPremiumRoomUpgradeService)
+        guestDataProvider = new GuestDataProvider()
+        dataProviderGuestService = new DataProviderGuestService(guestDataProvider)
+        defaultRoomOccupancyService = new DefaultRoomOccupancyService(dataProviderGuestService)
     }
 
     def "shouldCalculateRoomOccupancy"() {
         given:
-        guestDataProvider = new GuestDataProvider()
-        defaultRoomOccupancyService = new DefaultRoomOccupancyService(emptyPremiumRoomUpgradeService, guestDataProvider, guestFactory)
         guestDataProvider.initialize(allGuests)
-
         def availableRooms = AvailableRooms.of(numPremium, numEconomy)
         when:
         def calculation = defaultRoomOccupancyService.calculateRoomOccupancy(availableRooms)

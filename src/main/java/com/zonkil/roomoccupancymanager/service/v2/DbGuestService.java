@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 
-@Service
+@Service("DbGuestService")
 public class DbGuestService implements GuestService {
 
 	private final GuestRepository guestRepository;

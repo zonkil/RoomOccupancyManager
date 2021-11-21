@@ -3,6 +3,7 @@ package com.zonkil.roomoccupancymanager.service.v2;
 import com.zonkil.roomoccupancymanager.domain.AvailableRooms;
 import com.zonkil.roomoccupancymanager.domain.RoomOccupancyCalculation;
 import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -11,11 +12,10 @@ import java.math.BigDecimal;
 public class DefaultRoomOccupancyCalculationV2Service implements RoomOccupancyServiceV2 {
 	private final GuestService guestService;
 
-	public DefaultRoomOccupancyCalculationV2Service(GuestService guestService) {
+	public DefaultRoomOccupancyCalculationV2Service(@Qualifier("DbGuestService") GuestService guestService) {
 		this.guestService = guestService;
 	}
 
-	//@Transactional(readOnly = true, isolation = Isolation.SERIALIZABLE)
 	public RoomOccupancyCalculation calculateRoomOccupancy(AvailableRooms availableRooms) {
 
 		long premiumGuestCount = guestService.countGuests(GuestType.PREMIUM);

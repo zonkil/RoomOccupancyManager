@@ -1,58 +1,84 @@
 package com.zonkil.roomoccupancymanager.service;
 
 import com.zonkil.roomoccupancymanager.domain.AvailableRooms;
-import com.zonkil.roomoccupancymanager.domain.DefaultGuestsFactory;
-import com.zonkil.roomoccupancymanager.domain.Guest;
 import com.zonkil.roomoccupancymanager.domain.RoomOccupancyCalculation;
+import com.zonkil.roomoccupancymanager.service.v2.GuestService;
+import com.zonkil.roomoccupancymanager.service.v2.GuestType;
+import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.util.List;
 
 @Service
 public class DefaultRoomOccupancyService implements RoomOccupancyService {
 
-	private final GuestUpgradeService guestUpgradeService;
-	private final DefaultGuestsFactory defaultGuestsFactory;
-	private final GuestDataProvider guestDataProvider;
+	private final GuestService guestService;
 
-	public DefaultRoomOccupancyService(GuestUpgradeService guestUpgradeService, GuestDataProvider guestDataProvider,
-			DefaultGuestsFactory defaultGuestsFactory) {
-		this.guestUpgradeService = guestUpgradeService;
-		this.defaultGuestsFactory = defaultGuestsFactory;
-		this.guestDataProvider = guestDataProvider;
+	public DefaultRoomOccupancyService(@Qualifier("DataProviderGuestService") GuestService guestService) {
+		this.guestService = guestService;
 	}
 
-	@Override
 	public RoomOccupancyCalculation calculateRoomOccupancy(AvailableRooms availableRooms) {
 
-		var guestData = guestDataProvider.getGuestData();
-		var guests = defaultGuestsFactory.createGuests(guestData);
-		guests = guestUpgradeService.upgradeGuestsIfNeeded(availableRooms, guests);
+		long premiumGuestCount = guestService.countGuests(GuestType.PREMIUM);
+		long economyGuestCount = guestService.countGuests(GuestType.ECONOMY);
+		if (premiumGuestCount == 0 && economyGuestCount == 0) {
+			return RoomOccupancyCalculation.ZERO;
+		}
 
-		var premiumOccupancy = occupancy(availableRooms.getNumberOfPremiumRooms(), guests.getPremiumGuestsNumber());
-		var economyOccupancy = occupancy(availableRooms.getNumberOfEconomyRooms(), guests.getEconomyGuestsNumber());
-		var premiumMoney = calculateMoneyLimitedByRooms(guests.getPremiumGuests(),
-				availableRooms.getNumberOfPremiumRooms());
-		var economyMoney = calculateMoneyLimitedByRooms(guests.getEconomyGuests(),
-				availableRooms.getNumberOfEconomyRooms());
+		var upgradeData = calculateUpgrade(availableRooms, premiumGuestCount, economyGuestCount);
+
+		BigDecimal premiumProfit = calculatePremiumProfit(availableRooms, upgradeData);
+		BigDecimal economyProfit = calculateEconomyProfit(availableRooms, upgradeData);
+
+		long premiumOccupancy = Math.min(availableRooms.getNumberOfPremiumRooms(),
+				premiumGuestCount + upgradeData.numberOfGuestToPromote);
+		long economyOccupancy = Math.min(availableRooms.getNumberOfEconomyRooms(),
+				economyGuestCount - upgradeData.numberOfGuestToPromote);
 
 		return RoomOccupancyCalculation.builder()
-									   .premiumOccupancy(premiumOccupancy)
-									   .premiumTotalMoney(premiumMoney)
-									   .economyOccupancy(economyOccupancy)
-									   .economyTotalMoney(economyMoney)
+									   .premiumOccupancy((int) premiumOccupancy)
+									   .premiumTotalMoney(premiumProfit)
+									   .economyOccupancy((int) economyOccupancy)
+									   .economyTotalMoney(economyProfit)
 									   .build();
 	}
 
-	private int occupancy(int numberOfPremiumRooms, int numberOfGuests) {
-		return Math.min(numberOfPremiumRooms, numberOfGuests);
+	private UpgradeData calculateUpgrade(AvailableRooms availableRooms, long premiumGuestCount,
+			long economyGuestCount) {
+		BigDecimal upgradedGuestsProfit = BigDecimal.ZERO;
+		long numberOfGuestToPromote = availableRooms.getNumberOfPremiumRooms() - premiumGuestCount;
+		if (isUpgradePossible(numberOfGuestToPromote, economyGuestCount, availableRooms)) {
+			upgradedGuestsProfit = guestService.calculateProfit(GuestType.ECONOMY, numberOfGuestToPromote);
+		}
+		else {
+			numberOfGuestToPromote = 0;
+		}
+
+		return UpgradeData.of(upgradedGuestsProfit, numberOfGuestToPromote);
 	}
 
-	private BigDecimal calculateMoneyLimitedByRooms(List<Guest> guestsList, int numberOfRooms) {
-		return guestsList.stream()
-						 .limit(numberOfRooms)
-						 .map(Guest::getMoneyAmount)
-						 .reduce(BigDecimal.ZERO, BigDecimal::add);
+	private boolean isUpgradePossible(long numberOfGuestToPromote, long economyGuestCount,
+			AvailableRooms availableRooms) {
+		return numberOfGuestToPromote > 0 && economyGuestCount > availableRooms.getNumberOfEconomyRooms();
+	}
+
+	private BigDecimal calculatePremiumProfit(AvailableRooms availableRooms, UpgradeData upgradeData) {
+		BigDecimal premiumProfit = guestService.calculateProfit(GuestType.PREMIUM,
+				availableRooms.getNumberOfPremiumRooms());
+		return premiumProfit.add(upgradeData.upgradedGuestsProfit);
+	}
+
+	private BigDecimal calculateEconomyProfit(AvailableRooms availableRooms, UpgradeData upgradeData) {
+		BigDecimal economyProfitWithUpgraded = guestService.calculateProfit(GuestType.ECONOMY,
+				availableRooms.getNumberOfEconomyRooms() + upgradeData.numberOfGuestToPromote);
+		return economyProfitWithUpgraded.subtract(upgradeData.upgradedGuestsProfit);
+	}
+
+	@AllArgsConstructor(staticName = "of")
+	private static class UpgradeData {
+		private BigDecimal upgradedGuestsProfit;
+		private long numberOfGuestToPromote;
 	}
 }
