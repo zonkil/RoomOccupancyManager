@@ -1,7 +1,6 @@
 package com.zonkil.roomoccupancymanager.service
 
 import com.zonkil.roomoccupancymanager.domain.AvailableRooms
-import com.zonkil.roomoccupancymanager.domain.DefaultGuestsFactory
 import spock.lang.Specification
 import spock.lang.Subject
 

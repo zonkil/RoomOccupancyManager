@@ -1,6 +1,5 @@
 package com.zonkil.roomoccupancymanager.web
 
-import com.zonkil.roomoccupancymanager.domain.GuestsFactory
 import com.zonkil.roomoccupancymanager.persistance.repositories.GuestRepository
 import com.zonkil.roomoccupancymanager.service.GuestDataProvider
 import com.zonkil.roomoccupancymanager.service.RoomOccupancyService

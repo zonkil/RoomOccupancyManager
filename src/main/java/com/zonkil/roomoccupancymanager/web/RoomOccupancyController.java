@@ -1,7 +1,6 @@
 package com.zonkil.roomoccupancymanager.web;
 
 import com.zonkil.roomoccupancymanager.domain.AvailableRooms;
-import com.zonkil.roomoccupancymanager.domain.GuestsFactory;
 import com.zonkil.roomoccupancymanager.service.GuestDataProvider;
 import com.zonkil.roomoccupancymanager.service.RoomOccupancyService;
 import com.zonkil.roomoccupancymanager.web.dto.RoomOccupancyCalculationResponseDto;
