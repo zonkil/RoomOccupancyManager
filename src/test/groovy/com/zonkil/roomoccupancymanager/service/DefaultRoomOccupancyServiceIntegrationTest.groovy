@@ -13,7 +13,7 @@ class DefaultRoomOccupancyServiceIntegrationTest extends Specification {
 
     void setup() {
         guestDataProvider = new GuestDataProvider()
-        dataProviderGuestService = new DataProviderGuestService(guestDataProvider)
+        dataProviderGuestService = new DataProviderGuestService(guestDataProvider, 100.0)
         GuestServiceStrategy strategy = Mock()
         strategy.get() >> dataProviderGuestService
         defaultRoomOccupancyService = new DefaultRoomOccupancyService(strategy)
