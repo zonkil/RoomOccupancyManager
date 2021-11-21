@@ -13,9 +13,9 @@ public class RoomOccupancyCalculationToRoomOccupancyCalculationResponseDto
 	public RoomOccupancyCalculationResponseDto convert(RoomOccupancyCalculation source) {
 		return RoomOccupancyCalculationResponseDto.builder()
 												  .premiumOccupancy(source.getPremiumOccupancy())
-												  .premiumTotalMoney(source.getPremiumTotalMoney())
+												  .premiumProfit(source.getPremiumTotalMoney())
 												  .economyOccupancy(source.getEconomyOccupancy())
-												  .economyTotalMoney(source.getEconomyTotalMoney())
+												  .economyProfit(source.getEconomyTotalMoney())
 												  .build();
 	}
 }
